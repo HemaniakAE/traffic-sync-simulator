@@ -1,144 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipForward, ShoppingCart } from 'lucide-react';
+import Semaforo from './Components/Semaforo';
+import PanelControl from './Components/Controles';
 
-// Semáforo Component
-function Semaforo({ direction, x, y, lights }) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: x,
-        top: y,
-        width: '40px',
-        height: '100px',
-        background: '#222',
-        borderRadius: '10px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: '8px',
-        gap: '6px',
-        zIndex: 20,
-        boxShadow: '0 0 8px rgba(0,0,0,0.5)'
-      }}
-    >
-      <div style={{
-        position: 'absolute',
-        top: '-25px',
-        fontSize: '20px',
-        fontWeight: 'bold',
-        color: 'white',
-        textShadow: '1px 1px 2px black'
-      }}>
-        {direction}
-      </div>
-
-      <div style={{
-        width: '26px',
-        height: '26px',
-        borderRadius: '50%',
-        background: lights.red ? '#ff2d2d' : '#444'
-      }} />
-      <div style={{
-        width: '26px',
-        height: '26px',
-        borderRadius: '50%',
-        background: lights.yellow ? '#ffe733' : '#444'
-      }} />
-      <div style={{
-        width: '26px',
-        height: '26px',
-        borderRadius: '50%',
-        background: lights.green ? '#26ff5a' : '#444'
-      }} />
-    </div>
-  );
-}
-
-// Panel de Control
-function PanelControl({ onStart, onPause, onSkip, isRunning }) {
-  return (
-    <div style={{
-      position: 'absolute',
-      textAlign: 'center',
-      top: '25px',
-      left: '25px',
-      width: '300px',
-      background: 'rgb(0, 0, 0)',
-      border: '2px solid white',
-      padding: '15px',
-      borderRadius: '10px',
-      zIndex: 9999
-    }}>
-      <h2 style={{ color: 'white', marginBottom: '1em', marginTop: '0.5em' }}>Controles</h2>
-
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: '12px',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <button
-          onClick={onStart}
-          disabled={isRunning}
-          style={{
-            width: '50px',
-            height: '50px',
-            background: isRunning ? '#cccccc' : '#faf9f9',
-            border: '1px solid white',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: isRunning ? 'not-allowed' : 'pointer',
-            color: '#000000'
-          }}
-        >
-          <Play size={24} fill="black" />
-        </button>
-
-        <button
-          onClick={onPause}
-          disabled={!isRunning}
-          style={{
-            width: '50px',
-            height: '50px',
-            background: !isRunning ? '#cccccc' : '#faf9f9',
-            border: '1px solid white',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: !isRunning ? 'not-allowed' : 'pointer',
-            color: '#000000'
-          }}
-        >
-          <Pause size={24} fill="black" />
-        </button>
-
-        <button
-          onClick={onSkip}
-          disabled={!isRunning}
-          style={{
-            width: '50px',
-            height: '50px',
-            background: !isRunning ? '#cccccc' : '#faf9f9',
-            border: '1px solid white',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: !isRunning ? 'not-allowed' : 'pointer',
-            color: '#000000'
-          }}
-        >
-          <SkipForward size={24} fill="black" />
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // App Principal
 export default function App() {
@@ -155,29 +19,31 @@ export default function App() {
 
   // Posiciones de los carritos
   const [carPositions, setCarPositions] = useState({
-    north: { top: -60, moving: false },
-    south: { bottom: -60, moving: false },
-    east: { right: -60, moving: false },
-    west: { left: -60, moving: false }
+    north: { top: -100, visible: false },
+    south: { bottom: -100, visible: false },
+    east: { right: -100, visible: false },
+    west: { left: -100, visible: false }
   });
 
   const cycleRef = useRef(0);
   const animationRef = useRef(null);
   const isRunningRef = useRef(false);
 
-  // Configuración de ciclos (en milisegundos)
+  // Configuración de ciclos
   const CYCLE_CONFIG = {
-    green: 5000,    // 5 segundos en verde
-    yellow: 2000,   // 2 segundos en amarillo
-    red: 7000       // 7 segundos en rojo
+    green: 5000,    // 8 segundos
+    yellow: 2000,   // 2 segundos
+    red: 1000       // 1 segundo
   };
+
+  // Velocidad más lenta y suave
+  const CAR_SPEED = 10;
 
   // Controlador de semáforos con computación paralela
   const trafficController = useRef({
     workers: {},
     
     initWorkers() {
-      // Simulación de workers paralelos para cada semáforo
       ['N', 'S', 'E', 'O'].forEach(direction => {
         this.workers[direction] = {
           direction,
@@ -188,11 +54,11 @@ export default function App() {
     },
 
     async runCycle(cycleNumber) {
-      // Ciclo 1: Norte-Sur en verde, Este-Oeste en rojo
+      // Ciclo par
       if (cycleNumber % 2 === 0) {
         await this.setLights('N', 'S', 'E', 'O');
       } 
-      // Ciclo 2: Este-Oeste en verde, Norte-Sur en rojo
+      // Ciclo impar
       else {
         await this.setLights('E', 'O', 'N', 'S');
       }
@@ -200,6 +66,9 @@ export default function App() {
 
     async setLights(green1, green2, red1, red2) {
       if (!isRunningRef.current) return;
+
+      // Resetear posiciones y hacer visibles los carritos que van a moverse
+      this.resetAndShowCars([green1, green2]);
 
       // Verde para un par
       setTrafficLights({
@@ -209,7 +78,7 @@ export default function App() {
         [red2]: { red: true, yellow: false, green: false }
       });
 
-      // Iniciar movimiento de carritos
+      // Iniciar movimiento
       this.moveCars([green1, green2], true);
 
       await this.sleep(CYCLE_CONFIG.green);
@@ -226,10 +95,10 @@ export default function App() {
       await this.sleep(CYCLE_CONFIG.yellow);
       if (!isRunningRef.current) return;
 
-      // Detener carritos
-      this.moveCars([green1, green2], false);
+      // Ocultar carritos que estaban en movimiento
+      this.hideCars([green1, green2]);
 
-      // Rojo para todos (transición segura)
+      // Rojo para todos
       setTrafficLights({
         [green1]: { red: true, yellow: false, green: false },
         [green2]: { red: true, yellow: false, green: false },
@@ -237,14 +106,55 @@ export default function App() {
         [red2]: { red: true, yellow: false, green: false }
       });
 
-      await this.sleep(1000); // 1 segundo de seguridad
+      await this.sleep(CYCLE_CONFIG.red);
+    },
+
+    resetAndShowCars(directions) {
+      const newPositions = {};
+      directions.forEach(dir => {
+        const dirMap = { N: 'north', S: 'south', E: 'east', O: 'west' };
+        const mappedDir = dirMap[dir];
+        
+        // Resetear a posición inicial y hacer visible
+        if (mappedDir === 'north' || mappedDir === 'south') {
+          newPositions[mappedDir] = { 
+            [mappedDir === 'north' ? 'top' : 'bottom']: -100,
+            visible: true,
+            moving: false
+          };
+        } else {
+          newPositions[mappedDir] = { 
+            [mappedDir === 'east' ? 'right' : 'left']: -100,
+            visible: true,
+            moving: false
+          };
+        }
+      });
+      
+      setCarPositions(prev => ({
+        ...prev,
+        ...newPositions
+      }));
     },
 
     moveCars(directions, shouldMove) {
       const newPositions = {};
       directions.forEach(dir => {
         const dirMap = { N: 'north', S: 'south', E: 'east', O: 'west' };
-        newPositions[dirMap[dir]] = { moving: shouldMove };
+        newPositions[dirMap[dir]] = { moving: shouldMove, visible: true };
+      });
+      
+      setCarPositions(prev => ({
+        ...prev,
+        ...newPositions
+      }));
+    },
+
+    hideCars(directions) {
+      const newPositions = {};
+      directions.forEach(dir => {
+        const dirMap = { N: 'north', S: 'south', E: 'east', O: 'west' };
+        newPositions[dirMap[dir]] = { moving: false, visible: false };
       });
       
       setCarPositions(prev => ({
@@ -268,12 +178,12 @@ export default function App() {
     isRunningRef.current = isRunning;
 
     if (!isRunning) {
-      // Detener todos los carritos cuando se pausa
+      // Oculta todos los carritos cuando se pausa
       setCarPositions(prev => ({
-        north: { ...prev.north, moving: false },
-        south: { ...prev.south, moving: false },
-        east: { ...prev.east, moving: false },
-        west: { ...prev.west, moving: false }
+        north: { ...prev.north, moving: false, visible: false },
+        south: { ...prev.south, moving: false, visible: false },
+        east: { ...prev.east, moving: false, visible: false },
+        west: { ...prev.west, moving: false, visible: false }
       }));
       return;
     }
@@ -296,40 +206,85 @@ export default function App() {
       setCarPositions(prev => {
         const newPos = { ...prev };
         
-        // Norte (se mueve hacia abajo)
-        if (prev.north.moving) {
-          const currentTop = prev.north.top || -60;
-          newPos.north = {
-            ...prev.north,
-            top: currentTop >= window.innerHeight ? -60 : currentTop + 3
-          };
+        // Norte
+        if (prev.north.moving && prev.north.visible) {
+          const currentTop = prev.north.top ?? -100;
+          const newTop = currentTop + CAR_SPEED;
+          
+          // Si sale de la pantalla se hace invisible
+          if (newTop > window.innerHeight + 100) {
+            newPos.north = {
+              ...prev.north,
+              top: -100,
+              visible: false,
+              moving: false
+            };
+          } else {
+            newPos.north = {
+              ...prev.north,
+              top: newTop
+            };
+          }
         }
 
-        // Sur (se mueve hacia arriba)
-        if (prev.south.moving) {
-          const currentBottom = prev.south.bottom || -60;
-          newPos.south = {
-            ...prev.south,
-            bottom: currentBottom >= window.innerHeight ? -60 : currentBottom + 3
-          };
+        // Sur
+        if (prev.south.moving && prev.south.visible) {
+          const currentBottom = prev.south.bottom ?? -100;
+          const newBottom = currentBottom + CAR_SPEED;
+          
+          if (newBottom > window.innerHeight + 100) {
+            newPos.south = {
+              ...prev.south,
+              bottom: -100,
+              visible: false,
+              moving: false
+            };
+          } else {
+            newPos.south = {
+              ...prev.south,
+              bottom: newBottom
+            };
+          }
         }
 
-        // Este (se mueve hacia la izquierda)
-        if (prev.east.moving) {
-          const currentRight = prev.east.right || -60;
-          newPos.east = {
-            ...prev.east,
-            right: currentRight >= window.innerWidth ? -60 : currentRight + 3
-          };
+        // Este
+        if (prev.east.moving && prev.east.visible) {
+          const currentRight = prev.east.right ?? -100;
+          const newRight = currentRight + CAR_SPEED;
+          
+          if (newRight > window.innerWidth + 100) {
+            newPos.east = {
+              ...prev.east,
+              right: -100,
+              visible: false,
+              moving: false
+            };
+          } else {
+            newPos.east = {
+              ...prev.east,
+              right: newRight
+            };
+          }
         }
 
-        // Oeste (se mueve hacia la derecha)
-        if (prev.west.moving) {
-          const currentLeft = prev.west.left || -60;
-          newPos.west = {
-            ...prev.west,
-            left: currentLeft >= window.innerWidth ? -60 : currentLeft + 3
-          };
+        // Oeste
+        if (prev.west.moving && prev.west.visible) {
+          const currentLeft = prev.west.left ?? -100;
+          const newLeft = currentLeft + CAR_SPEED;
+          
+          if (newLeft > window.innerWidth + 100) {
+            newPos.west = {
+              ...prev.west,
+              left: -100,
+              visible: false,
+              moving: false
+            };
+          } else {
+            newPos.west = {
+              ...prev.west,
+              left: newLeft
+            };
+          }
         }
 
         return newPos;
@@ -427,56 +382,60 @@ export default function App() {
         zIndex: 2
       }} />
 
-      {/* Carritos usando lucide-react */}
-      <div style={{
-        position: 'absolute',
-        fontSize: '48px',
-        color: '#ff3333',
-        zIndex: 10,
-        top: `${carPositions.north.top}px`,
-        left: 'calc(50% + 35px)',
-        transition: 'top 0.016s linear'
-      }}>
-        <ShoppingCart size={48} />
-      </div>
+      {/* Carritos - Solo visibles cuando están activos */}
+      {carPositions.north.visible && (
+        <div style={{
+          position: 'absolute',
+          fontSize: '48px',
+          color: '#ff3333',
+          zIndex: 10,
+          top: `${carPositions.north.top}px`,
+          left: 'calc(50% + 35px)'
+        }}>
+          <ShoppingCart size={48} />
+        </div>
+      )}
 
-      <div style={{
-        position: 'absolute',
-        fontSize: '48px',
-        color: '#3333ff',
-        zIndex: 10,
-        bottom: `${carPositions.south.bottom}px`,
-        left: 'calc(50% - 35px)',
-        transform: 'rotate(180deg)',
-        transition: 'bottom 0.016s linear'
-      }}>
-        <ShoppingCart size={48} />
-      </div>
+      {carPositions.south.visible && (
+        <div style={{
+          position: 'absolute',
+          fontSize: '48px',
+          color: '#3333ff',
+          zIndex: 10,
+          bottom: `${carPositions.south.bottom}px`,
+          left: 'calc(50% - 35px)',
+          transform: 'rotate(180deg)'
+        }}>
+          <ShoppingCart size={48} />
+        </div>
+      )}
 
-      <div style={{
-        position: 'absolute',
-        fontSize: '48px',
-        color: '#33ff33',
-        zIndex: 10,
-        right: `${carPositions.east.right}px`,
-        top: 'calc(50% + 35px)',
-        transform: 'scaleX(-1)',
-        transition: 'right 0.016s linear'
-      }}>
-        <ShoppingCart size={48} />
-      </div>
+      {carPositions.east.visible && (
+        <div style={{
+          position: 'absolute',
+          fontSize: '48px',
+          color: '#33ff33',
+          zIndex: 10,
+          right: `${carPositions.east.right}px`,
+          top: 'calc(50% + 35px)',
+          transform: 'scaleX(-1)'
+        }}>
+          <ShoppingCart size={48} />
+        </div>
+      )}
 
-      <div style={{
-        position: 'absolute',
-        fontSize: '48px',
-        color: '#ff33ff',
-        zIndex: 10,
-        left: `${carPositions.west.left}px`,
-        top: 'calc(50% - 35px)',
-        transition: 'left 0.016s linear'
-      }}>
-        <ShoppingCart size={48} />
-      </div>
+      {carPositions.west.visible && (
+        <div style={{
+          position: 'absolute',
+          fontSize: '48px',
+          color: '#ff33ff',
+          zIndex: 10,
+          left: `${carPositions.west.left}px`,
+          top: 'calc(50% - 35px)'
+        }}>
+          <ShoppingCart size={48} />
+        </div>
+      )}
 
       {/* Semáforos */}
       <Semaforo 
@@ -523,9 +482,10 @@ export default function App() {
         padding: '10px 20px',
         borderRadius: '10px',
         border: '2px solid white',
-        zIndex: 9999
+        zIndex: 9999,
+        fontFamily: 'monospace'
       }}>
-        Ciclo actual: {currentCycle} | Estado: {isRunning ? '🟢 En ejecución' : '🔴 Pausado'}
+        Ciclo: {currentCycle} | Estado: {isRunning ? '🟢 En ejecución' : '🔴 Pausado'}
       </div>
     </div>
   );
