@@ -1,5 +1,7 @@
-/* --- FONDO DE CÉSPED --- */
-:root {
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   background: repeating-linear-gradient(
     45deg,
     #1dd117,
@@ -7,13 +9,119 @@
     #18b215 5px,
     #18b215 10px
   );
-}
-
-/* --- LAYOUT GENERAL --- */
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
   overflow: hidden;
 }
 
+/* Carretera vertical */
+.road-vertical {
+  position: absolute;
+  width: 160px;
+  height: 100vh;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3b3b3b;
+  z-index: 1;
+}
+
+.road-line-vertical {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 10px;
+  height: 100%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    #ffc800 0%,
+    #ffc800 60%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 10px 45px;
+  background-repeat: repeat-y;
+}
+
+/* Carretera horizontal */
+.road-horizontal {
+  position: absolute;
+  height: 160px;
+  width: 100vw;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #3b3b3b;
+  z-index: 1;
+}
+
+.road-line-horizontal {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 10px;
+  width: 100%;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    to right,
+    #ffc800 0%,
+    #ffc800 60%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 45px 10px;
+  background-repeat: repeat-x;
+}
+
+/* Intersección */
+.intersection {
+  position: absolute;
+  width: 150px;
+  height: 170px;
+  background: #3b3b3b;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Carros */
+.car {
+  position: absolute;
+  font-size: 48px;
+  z-index: 10;
+}
+
+.car-north {
+  color: #ff3333;
+  left: calc(50% + 35px);
+}
+
+.car-south {
+  color: #3333ff;
+  left: calc(50% - 35px);
+  transform: rotate(180deg);
+}
+
+.car-east {
+  color: #33ff33;
+  top: calc(50% + 35px);
+  transform: scaleX(-1);
+}
+
+.car-west {
+  color: #ff33ff;
+  top: calc(50% - 35px);
+}
+
+/* Info del ciclo */
+.cycle-info {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px solid white;
+  z-index: 9999;
+  font-family: monospace;
+}
