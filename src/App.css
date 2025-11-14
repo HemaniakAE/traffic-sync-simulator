@@ -33,7 +33,7 @@ body {
 /* CARRETERA VERTICAL */
 .road-vertical {
   width: 160px;
-  height: 100vh;
+  height: 150vh;
   left: 50%;
   transform: translateX(-50%);
 }
