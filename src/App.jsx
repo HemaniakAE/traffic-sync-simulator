@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipForward, ShoppingCart } from 'lucide-react';
 import Semaforo from './Components/Semaforo';
 import PanelControl from './Components/Controles';
+import ReturnButton from './Components/ReturnButton';
 import './App.css';
 
 export default function App() {
@@ -236,6 +237,8 @@ export default function App() {
   return (
     <div className="app-container">
 
+      <ReturnButton />
+
       {/* Carreteras */}
       <div className="road-vertical">
         <div className="road-line-vertical" />
@@ -299,6 +302,8 @@ export default function App() {
         Ciclo: {currentCycle} | Activo: {activeDirection} | Estado:{" "}
         {isRunning ? "🟢 En ejecución" : "🔴 Pausado"}
       </div>
+
+
     </div>
   );
 }
