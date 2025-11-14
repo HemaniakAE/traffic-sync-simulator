@@ -1,6 +1,129 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* --- FONDO DE CÉSPED --- */
+:root {
+  background: repeating-linear-gradient(
+    45deg,
+    #1dd117,
+    #1dd117 5px,
+    #18b215 5px,
+    #18b215 10px
+  );
 }
+
+/* --- LAYOUT GENERAL --- */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.cross-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* --- CARRETERAS --- */
+.road {
+  position: absolute;
+  background: #3b3b3b; 
+  z-index: 1;
+}
+
+/* CARRETERA VERTICAL */
+.road-vertical {
+  width: 160px;
+  height: 100vh;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.road-vertical::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 10px;
+  height: 100%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    #ffc800 0%,
+    #ffc800 60%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 10px 45px;
+  background-repeat: repeat-y;
+}
+
+/* CARRETERA HORIZONTAL */
+.road-horizontal {
+  height: 160px;
+  width: 100vw;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.road-horizontal::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 10px;
+  width: 100%;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    to right,
+    #ffc800 0%,
+    #ffc800 60%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 45px 10px;
+  background-repeat: repeat-x;
+}
+
+/* ZONA LIMPIA EN LA INTERSECCIÓN */
+.intersection-center {
+  position: absolute;
+  width: 150px;
+  height: 170px;
+  background: #3b3b3b; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; 
+}
+
+/* --- CARROS --- */
+.car {
+  position: absolute;
+  display: inline-block; 
+  font-size: 48px;
+  color: #ff3333;
+  z-index: 10;
+}
+
+.car-north {
+  top: -60px;              
+  left: calc(50% + 35px);  
+}
+
+.car-south {
+  bottom: -60px;
+  left: calc(50% - 35px);  
+  transform: rotate(180deg); 
+}
+
+.car-west {
+  left: -60px;
+  top: calc(50% - 35px);
+}
+
+.car-east {
+  right: -60px;
+  top: calc(50% + 35px);
+  transform: scaleX(-1); /* invertir mirando a la izquierda */
+}
+

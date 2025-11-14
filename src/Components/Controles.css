@@ -1,0 +1,42 @@
+.panel-control {
+  position: absolute;
+  align-items: center;
+  top: 25px;
+  left: 25px;
+  height: 250px;
+  background: rgb(0, 0, 0) !important;
+  border: 2px solid white !important;
+  padding: 15px !important;
+  border-radius: 10px !important;
+  z-index: 9999 !important;
+}
+
+/* Título del panel */
+.panel-control h2 {
+  color: yellow !important;
+  margin-bottom: 1em;
+}
+
+/* Botones del panel */
+.panel-control button {
+  width: 50px !important;
+  height: 50px !important;
+  background: #faf9f9 !important;
+  border: 1px solid white !important;
+  border-radius: 12px !important;
+  display: flex;
+  margin-top: 1em;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #000000 !important; /* Color negro para los iconos */
+}
+
+.panel-control button:hover {
+  background: #e0e0e0 !important;
+}
+
+/* Asegurar que los SVG hereden el color */
+.panel-control button svg {
+  display: block;
+}
